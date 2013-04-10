@@ -1,5 +1,8 @@
 <?php
 namespace SimilarTransactions;
+include 'Player/HistoryParser.php';
+include 'Player.php';
+include 'Team.php';
 class SMGrabber
 {
     protected $useragent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.43 Safari/537.31 (CelloG\'s Similar Transaction Script (0.1.0))';
@@ -12,11 +15,16 @@ class SMGrabber
             $this->relogin();
         }
         $context = stream_context_create(array('http' => array(
-            'follow_location' => 1,
+            'follow_location' => 0,
             'user_agent' => $this->useragent,
             'header' => 'Cookie: ' . $this->processCookies()
         )));
-        return file_get_contents($url, false, $context);
+        $fp = fopen($url, 'r', false, $context);
+        $info = stream_get_meta_data($fp);
+        $this->getCookies($info['wrapper_data']);
+        $ret = stream_get_contents($fp);
+        fclose($fp);
+        return $ret;
     }
 
     protected function processCookies()
@@ -37,7 +45,7 @@ class SMGrabber
                 $line = explode(';', $line);
                 $line = trim($line[0]);
                 $line = explode('=', $line);
-                if (isset($this->cookies[$line[0]])) continue;
+                //if (isset($this->cookies[$line[0]])) continue;
                 $this->cookies[$line[0]] = $line[1];
             }
         }
@@ -72,8 +80,6 @@ class SMGrabber
         $fp = fopen('http://en.strikermanager.com/loginweb.php', 'r', false, $context);
         $info = stream_get_meta_data($fp);
         $this->getCookies($info['wrapper_data']);
-        var_dump($this->processCookies());
-        var_export($info);
         fclose($fp);
         $context = stream_context_create(array('http' => array(
             'user_agent' => $this->useragent,
@@ -84,10 +90,15 @@ class SMGrabber
         $fp = fopen('http://en.strikermanager.com/inicio.php', 'r', false, $context);
         $info = stream_get_meta_data($fp);
         $this->getCookies($info['wrapper_data']);
-        echo stream_get_contents($fp);
         fclose($fp);
         $this->loggedin = true;
     }
 }
 $a = new SMGrabber;
-echo $a->download('http://en.strikermanager.com/liga.php?id_liga=51210');
+$league = $a->download('http://en.strikermanager.com/liga.php?id_liga=51210');
+preg_match_all('/equipo\.php\?id=(\d+)/', $league, $matches);
+foreach($matches[1] as $team) {
+    $team = new Team($team);
+    $team->getSquad($a);
+}
+?>
