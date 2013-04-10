@@ -2,14 +2,20 @@
 namespace SimilarTransactions\Player;
 class HistoryParser
 {
-    function downloadAndParse($downloader, $player)
+    function downloadAndParse($downloader, $player, $parent)
     {
         $transfers = array();
         $page = '';
         $num = 1;
+        $age = 0;
         do {
-            $history = $downloader->download('http://en.strikermanager.com/historial.php?id_jugador=' . $player . $page);
-            $transfers = array_merge($transfers, $this->parse($history));
+            $history = $downloader->download($url = 'http://en.strikermanager.com/historial.php?id_jugador=' . $player . $page);
+            if (!$age) {
+                preg_match('@<td>Age</td>\s+<td>(\d+) years</td>@', $history, $match);
+                $age = $match[1];
+                $parent->setCurrentAge($age);
+            }
+            $transfers = array_merge($transfers, $this->parse($history, $url));
             if (preg_match('@historial\.php\?id_jugador=' . $player . '&pagina=' . $num . '@',
                            $history, $nextpage)) {
                 $page = '&pagina=' . $num++;
@@ -20,7 +26,7 @@ class HistoryParser
         return $transfers;
     }
 
-    function parse($history)
+    function parse($history, $url)
     {
         preg_match_all('@<td style="white-space:nowrap;">(?<stamp>[^<]+)</td>\s+' .
                        '<td class="equipo"><a href="equipo.php\?id=\d+">[^<]+</a></td>\s+' .
@@ -41,6 +47,7 @@ class HistoryParser
                 'average' => $matches['average'][$i],
                 'amount' => str_replace('.','', $matches['amount'][$i]),
                 'type' => $matches['type'][$i],
+                'url' => $url,
             );
         }
         return $transfers;

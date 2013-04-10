@@ -4,7 +4,9 @@ class Player
 {
     public
         $id,
-        $transfers;
+        $transfers,
+        $age,
+        $pos;
     function __construct($id)
     {
         $this->id = $id;
@@ -13,6 +15,16 @@ class Player
     function getTransfers($downloader)
     {
         $a = new Player\HistoryParser;
-        $this->transfers = $a->downloadAndParse($downloader, $this->id);
+        $this->transfers = $a->downloadAndParse($downloader, $this->id, $this);
+    }
+
+    function setCurrentAge($age)
+    {
+        $this->age = $age;
+    }
+
+    function setPosition($pos)
+    {
+        $this->pos = $pos;
     }
 }
