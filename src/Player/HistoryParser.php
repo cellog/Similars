@@ -44,7 +44,8 @@ class HistoryParser
                        '<td class="numerico">(?<average>\d+)</td>\s+' .
                        '<td><a href="equipo.php\?id=\d+">[^<]+</a></td>\s+' .
                        '<td class="numerico">(?<amount>[0-9\.]+) &euro;</td>\s+' .
-                       '<td class="numerico" style="white-space:nowrap;">(?<type>Transfer agreement|Hostile Clause|Auction|Direct Purchase)</td>\s+' .
+                       '<td class="numerico" style="white-space:nowrap;">' .
+                       '(?<type>Transfer agreement|Hostile Clause|Auction|Direct Purchase)</td>\s+' .
                        '<td class="numerico">[0-9\.]+&nbsp;&euro;</td>@', $history, $matches);
         $transfers = array();
         foreach ($matches[0] as $i => $notused) {

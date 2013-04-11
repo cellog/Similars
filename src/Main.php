@@ -84,6 +84,47 @@ class Main
         return $ret;
     }
 
+    /**
+     * convert to a Mysql TIMESTAMP
+     */
+    function toTimeStamp($stamp)
+    {
+        $d = new DateTime;
+        $d->setTimestamp($stamp);
+        return $d->format('Y-m-d H:i');
+    }
+
+    /**
+     * convert to a unix timestamp
+     */
+    function fromTimeStamp($stamp)
+    {
+        $d = DateTime::createFromFormat('Y-m-d H:i', $stamp);
+        return $d->getTimestamp();
+    }
+
+    function toTypeCode($type)
+    {
+        $arr = array(
+            'Transfer agreement' => 0,
+            'Hostile Clause' => 1,
+            'Auction' => 2,
+            'Direct Purchase' => 3
+        );
+        return $arr[$type];
+    }
+
+    function fromTypeCode($code)
+    {
+        $arr = array(
+            'Transfer agreement',
+            'Hostile Clause',
+            'Auction',
+            'Direct Purchase'
+        );
+        return $arr[$code];
+    }
+
     function getTransfers($hash)
     {
         $transfers = $this->db->query('SELECT * FROM transactions WHERE hash="' . $this->db->real_escape_string($hash).'"
@@ -94,10 +135,10 @@ class Main
         }
         while ($transfer = $transfers->fetch_assoc()) {
             $ret[] = array(
-                'timestamp' => $transfer['stamp'],
+                'timestamp' => $this->fromTimeStamp($transfer['stamp']),
                 'average' => $transfer['average'],
                 'price' => $transfer['price'],
-                'type' => $transfer['type'],
+                'type' => $this->fromTypeCode($transfer['type']),
                 'url' => $transfer['url'],
             );
         }
@@ -124,8 +165,8 @@ class Main
                              "' . $this->db->real_escape_string($player->getPlayerHash()) . '",
                              "' . $this->db->real_escape_string($player->pos) . '",
                              "' . $this->db->real_escape_string($transfer['price']) . '",
-                             "' . $this->db->real_escape_string($transfer['timestamp']) . '",
-                             "' . $this->db->real_escape_string($transfer['type']) . '",
+                             "' . $this->db->real_escape_string($this->toTimeStamp($transfer['timestamp'])) . '",
+                             "' . $this->db->real_escape_string($this->toTypeCode($transfer['type'])) . '",
                              "' . $this->db->real_escape_string($transfer['url']) . '"
                              );');
         }
