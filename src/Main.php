@@ -123,6 +123,7 @@ class Main
                              "' . $this->db->real_escape_string($transfer['average']) . '",
                              "' . $this->db->real_escape_string($player->getPlayerHash()) . '",
                              "' . $this->db->real_escape_string($player->pos) . '",
+                             "' . $this->db->real_escape_string($transfer['price']) . '",
                              "' . $this->db->real_escape_string($transfer['timestamp']) . '",
                              "' . $this->db->real_escape_string($transfer['type']) . '",
                              "' . $this->db->real_escape_string($transfer['url']) . '"
