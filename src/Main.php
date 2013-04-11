@@ -106,19 +106,19 @@ class Main
 
     function updatePlayer(Player $player)
     {
-        $this->db->query('REPLACE INTO player (team_id, hash, lastupdated, current_age, position) VALUES (
+        $this->db->query($z = 'REPLACE INTO player (team_id, hash, lastupdated, current_age, position) VALUES (
                          "' . $this->db->real_escape_string($player->team) . '",
                          "' . $this->db->real_escape_string($player->getPlayerHash()) . '",
                          CURRENT_TIMESTAMP,
                          "' . $this->db->real_escape_string($player->age) . '",
-                         "' . $this->db->real_escape_string($player->pos) . '",
+                         "' . $this->db->real_escape_string($player->pos) . '"
                          );');
         foreach ($player->transfers as $transfer) {
             $age = $this->getAgeOfTransaction($transfer['timestamp'], $player->age);
             if (!$age) {
                 continue;
             }
-            $this->db->query('REPLACE INTO transaction (age, average, hash, position, price, stamp, type, url) VALUES (
+            $this->db->query($z = 'REPLACE INTO transaction (age, average, hash, position, price, stamp, type, url) VALUES (
                              "' . $this->db->real_escape_string($age) . '",
                              "' . $this->db->real_escape_string($transfer['average']) . '",
                              "' . $this->db->real_escape_string($player->getPlayerHash()) . '",
