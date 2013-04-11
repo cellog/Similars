@@ -1,8 +1,5 @@
 <?php
 namespace SimilarTransactions;
-include 'Player/HistoryParser.php';
-include 'Player.php';
-include 'Team.php';
 class SMGrabber
 {
     protected $useragent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.43 Safari/537.31 (CelloG\'s Similar Transaction Script (0.1.0))';
@@ -93,12 +90,5 @@ class SMGrabber
         fclose($fp);
         $this->loggedin = true;
     }
-}
-$a = new SMGrabber;
-$league = $a->download('http://en.strikermanager.com/liga.php?id_liga=51210');
-preg_match_all('/equipo\.php\?id=(\d+)/', $league, $matches);
-foreach($matches[1] as $team) {
-    $team = new Team($team);
-    $team->getSquad($a);
 }
 ?>
