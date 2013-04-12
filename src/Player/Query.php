@@ -113,5 +113,6 @@ class Query
                 'url' => $transfer['url'],
             );
         }
+        return $ret;
     }
 }
