@@ -3,6 +3,7 @@ namespace SimilarTransactions;
 use Mysqli, mysqli_sql_exception, DateTime;
 class Main
 {
+    const DEBUG = true;
     protected $user;
     protected $pass;
     protected $database;
@@ -33,6 +34,11 @@ class Main
         }
         $this->setupDatabase();
         $this->downloader = new SMGrabber;
+    }
+
+    function getDatabase()
+    {
+        return $this->db;
     }
 
     function setupDatabase()
@@ -177,9 +183,9 @@ class Main
         $id = $this->start;
         do {
             $league = $this->downloader->download('http://en.strikermanager.com/liga.php?id_liga=' . $id);
-            preg_match_all('/equipo\.php\?id=(\d+)/', $league, $matches);
-            foreach($matches[1] as $team) {
-                $team = new Team($team);
+            preg_match_all('@equipo\.php\?id=(\d+)">([^<]+)<@', $league, $matches);
+            foreach($matches[1] as $i => $team) {
+                $team = new Team($team, $matches[2][$i]);
                 $team->getSquad($this->downloader, $this);
                 $team->update($this);
             }

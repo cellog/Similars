@@ -4,15 +4,20 @@ class Team
 {
     public
         $id,
+        $name,
         $seniors = array(),
         $juniors = array();
-    function __construct($id)
+    function __construct($id, $name)
     {
         $this->id = $id;
+        $this->name = htmlspecialchars_decode($name);
     }
 
     function getSquad($downloader, Main $main)
     {
+        if (Main::DEBUG) {
+            echo "Processing " . $this->name, "\n";
+        }
         $senior = $downloader->download('http://en.strikermanager.com/plantilla.php?id_equipo=' . $this->id);
         preg_match_all('@jugador\.php\?id_jugador=(\d+)" >[^<]+</a></td>\s+' .
                        '<td style="text-align: center;" title="[^"]+"><div style="display: none;">[^<]+</div>([A-Z]+)<@',
