@@ -26,6 +26,8 @@ class Main
         $this->user = $info['user'];
         $this->pass = $info['password'];
         $this->database = $info['database'];
+        $this->login = $info['login'];
+        $this->password = $info['loginpass'];
         \mysqli_report(MYSQLI_REPORT_STRICT);
         try {
             $this->db = new Mysqli('127.0.0.1', $this->user, $this->pass, $this->database);
@@ -39,6 +41,16 @@ class Main
     function getDatabase()
     {
         return $this->db;
+    }
+
+    function getLogin()
+    {
+        return $this->login;
+    }
+
+    function getPassword()
+    {
+        return $this->loginpass;
     }
 
     function setupDatabase()

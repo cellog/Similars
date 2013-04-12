@@ -6,6 +6,13 @@ class SMGrabber
     protected $cookies = '';
     protected $downloadcount = 0;
     protected $loggedin = false;
+    protected $main;
+    function __construct(Main $main)
+    {
+        $this->cookies = $main->getCookies();
+        $this->main = $main;
+    }
+
     function download($url)
     {
         if ($downloadcount == 4995 || !$this->loggedin) {
@@ -30,7 +37,7 @@ class SMGrabber
         foreach ($this->cookies as $name => $value) {
             $cookie[] = $name . '=' . $value;
         }
-        return implode('; ', $cookie);
+        return $main->setCookies(implode('; ', $cookie));
     }
 
     protected function getCookies($data)
@@ -60,8 +67,8 @@ class SMGrabber
         file_get_contents('http://en.strikermanager.com/logout.php', false, $context);
         $this->cookies = array();
         $login = http_build_query(array(
-                'alias' => 'gunipig',
-                'pass' => 'flomflom934',
+                'alias' => $this->main->getLogin(),
+                'pass' => $this->main->getPassword(),
                 'dest' => ''
             ));
         $context = stream_context_create(array('http' => array(
