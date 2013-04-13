@@ -35,7 +35,7 @@ class Main
             die('Connect Error (' . $e->getMessage() . ')');
         }
         $this->setupDatabase();
-        $this->downloader = new SMGrabber;
+        $this->downloader = new SMGrabber($this);
     }
 
     function getDatabase()
@@ -194,6 +194,9 @@ class Main
     {
         $id = $this->start;
         do {
+            if (self::DEBUG) {
+                echo "downloading league ", $id, "\n";
+            }
             $league = $this->downloader->download('http://en.strikermanager.com/liga.php?id_liga=' . $id);
             preg_match_all('@equipo\.php\?id=(\d+)">([^<]+)<@', $league, $matches);
             foreach($matches[1] as $i => $team) {

@@ -46,4 +46,10 @@ class Player
         if ($this->hash) return $this->hash;
         return md5($this->id . ' similar ');
     }
+
+    function toJson()
+    {
+        $v = get_object_vars($this);
+        return json_encode($v, 1);
+    }
 }

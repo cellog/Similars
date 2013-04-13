@@ -9,11 +9,10 @@ class SMGrabber
     protected $main;
     function __construct(Main $main)
     {
-        $this->cookies = $main->getCookies();
         $this->main = $main;
     }
 
-    function download($url)
+    function download($url, $failed = false)
     {
         if ($downloadcount == 4995 || !$this->loggedin) {
             $this->relogin();
@@ -25,6 +24,14 @@ class SMGrabber
         )));
         $fp = fopen($url, 'r', false, $context);
         $info = stream_get_meta_data($fp);
+        if (strpos($info['wrapper_data'][0], '302')) {
+            if ($failed) {
+                die("Error: we were unable to login, check to make sure gunipig isn't blocked\n");
+            }
+            fclose($fp);
+            $this->loggedin = false;
+            return $this->download($url, true); // try again, with a login
+        }
         $this->getCookies($info['wrapper_data']);
         $ret = stream_get_contents($fp);
         fclose($fp);
@@ -37,7 +44,7 @@ class SMGrabber
         foreach ($this->cookies as $name => $value) {
             $cookie[] = $name . '=' . $value;
         }
-        return $main->setCookies(implode('; ', $cookie));
+        return implode('; ', $cookie);
     }
 
     protected function getCookies($data)
@@ -57,6 +64,7 @@ class SMGrabber
 
     function relogin()
     {
+        // TODO: check to see if the database cookie is different from ours, and if so, use it instead
         $logout = array(
             'user_agent' => $this->useragent,
         );
@@ -94,6 +102,7 @@ class SMGrabber
         $fp = fopen('http://en.strikermanager.com/inicio.php', 'r', false, $context);
         $info = stream_get_meta_data($fp);
         $this->getCookies($info['wrapper_data']);
+        // TODO: update the database with new cookie somehow, so others can pull it in too.
         fclose($fp);
         $this->loggedin = true;
     }
