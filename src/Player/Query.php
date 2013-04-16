@@ -57,17 +57,18 @@ class Query
 
     function average($average)
     {
-        if (!filter_var($average, \FILTER_VALIDATE_FLOAT) || $average < 1 || $average > 99) {
+        $ok = filter_var($average, \FILTER_VALIDATE_FLOAT);
+        if (!$ok || $average < 1 || $average > 99) {
             throw new \Exception('Invalid average "' . $average . '"');
         }
-        $this->averages[] = $average;
+        $this->averages[] = $ok;
         return $this;
     }
 
     function type($type)
     {
         $ok = $this->main->toTypeCode($type);
-        if (!$ok) {
+        if (false === $ok) {
             throw new \Exception('Unknown transaction type "' . $type . '"');
         }
         $this->types[] = $ok;
@@ -80,20 +81,29 @@ class Query
         return $this;
     }
 
+    function averagePrice($results)
+    {
+        $total = 0;
+        foreach ($results as $result) {
+            $total += $result['price'];
+        }
+        return $total/count($results);
+    }
+
     function search()
     {
         $sql = 'SELECT * FROM transaction WHERE 1=1 ';
-        if (count($this->age)) {
-            $sql .= ' AND age IN ("' . implode('","', $this->age) . '")';
+        if (count($this->ages)) {
+            $sql .= ' AND age IN ("' . implode('","', $this->ages) . '")';
         }
-        if (count($this->position)) {
-            $sql .= ' AND position IN ("' . implode('","', $this->position) . '")';
+        if (count($this->positions)) {
+            $sql .= ' AND position IN ("' . implode('","', $this->positions) . '")';
         }
-        if (count($this->average)) {
-            $sql .= ' AND average IN ("' . implode('","', $this->average) . '")';
+        if (count($this->averages)) {
+            $sql .= ' AND average IN ("' . implode('","', $this->averages) . '")';
         }
-        if (count($this->type)) {
-            $sql .= ' AND type IN ("' . implode('","', $this->type) . '")';
+        if (count($this->types)) {
+            $sql .= ' AND type IN ("' . implode('","', $this->types) . '")';
         }
         $sql .= ' ORDER BY stamp DESC';
         $result = $this->db->query($sql);
@@ -104,7 +114,7 @@ class Query
             return array();
         }
         $ret = array();
-        while (false !== ($transfer = $result->fetch_assoc())) {
+        while ($transfer = $result->fetch_assoc()) {
             $ret[] = array(
                 'timestamp' => $this->main->fromTimeStamp($transfer['stamp']),
                 'average' => $transfer['average'],
