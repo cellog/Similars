@@ -50,7 +50,7 @@ class Main
 
     function getPassword()
     {
-        return $this->loginpass;
+        return $this->password;
     }
 
     function setupDatabase()
@@ -117,7 +117,7 @@ class Main
      */
     function fromTimeStamp($stamp)
     {
-        $d = DateTime::createFromFormat('Y-m-d H:i', $stamp);
+        $d = DateTime::createFromFormat('Y-m-d H:i:s', $stamp);
         return $d->getTimestamp();
     }
 
@@ -258,6 +258,11 @@ class Main
             return 4;
         }
         return false; // too old to use
+    }
+
+    function getDownloader()
+    {
+        return $this->downloader;
     }
 
     function __destruct()

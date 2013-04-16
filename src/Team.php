@@ -22,7 +22,7 @@ class Team
         preg_match_all('@jugador\.php\?id_jugador=(\d+)" >[^<]+</a></td>\s+' .
                        '<td style="text-align: center;" title="[^"]+"><div style="display: none;">[^<]+</div>([A-Z]+)<@',
                        $senior, $players);
-        $seniors = new Team\SquadGrabber($players[1], $this->id, $this->downloader);
+        $seniors = new Team\SquadGrabber($players, $this->id, $downloader);
         $seniors->go();
         return;
         //foreach ($players[1] as $i => $player) {

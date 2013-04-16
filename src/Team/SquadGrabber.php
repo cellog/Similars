@@ -1,7 +1,7 @@
 <?php
 namespace SimilarTransactions\Team;
-use SimilarTransactions\Player, SimilarTransactions\Main;
-class SquadGrabber
+use SimilarTransactions\Player, SimilarTransactions\Main, SimilarTransactions\ProcessManager;
+class SquadGrabber extends ProcessManager
 {
     protected $nextleague = self::STARTLEAGUE;
     const STARTLEAGUE = 51206;
@@ -11,13 +11,13 @@ class SquadGrabber
     protected $players;
     protected $playerindex = -1;
     protected $downloader;
+    protected $cookies;
     function __construct($players, $id, $downloader)
     {
         $this->id = $id;
         $this->players = $players;
-        $this->downloader = $downloader;
+        $this->cookies = $downloader->retrieveCookies();
         // we need a fresh mysqli connection
-        $this->main = new Main('dummy'); // league numbers are not used here
     }
 
     function childSetup()
@@ -28,9 +28,9 @@ class SquadGrabber
     function parent()
     {
         if (Main::DEBUG) {
-            echo "parent " . $this->playerindex;
+            echo "parent " . $this->playerindex . "\n";
         }
-        return $this->playerindex >= count($this->players);
+        return $this->playerindex >= count($this->players[1]);
         $this->nextleague += 2;
         if ($this->nextleague == self::ENDLEAGUE) return true;
         return false;
@@ -38,13 +38,15 @@ class SquadGrabber
 
     function child()
     {
-        if (Main::DEBUG) {
-            echo "child " . $this->playerindex;
-        }
-        $player = new Player($player);
-        $player->setPosition($players[2][$this->playerindex]);
+        $player = new Player($this->players[1][$this->playerindex]);
+        $player->setPosition($this->players[2][$this->playerindex]);
         $player->setTeam($this->id);
-        $player->getTransfers($this->downloader, $this->main);
-        echo $player->toJson();
+        $main = new Main('dummy');
+        $main->getDownloader()->setCookies($this->cookies);
+        $player->getTransfers($main->getDownloader(), $main);
+        if (Main::DEBUG) {
+            echo "child " . $this->playerindex . "\n";
+        }
+        echo $player->toJson(),"\n";
     }
 }

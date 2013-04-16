@@ -12,6 +12,16 @@ class SMGrabber
         $this->main = $main;
     }
 
+    function setCookies($cookies)
+    {
+        $this->cookies = $cookies;
+    }
+
+    function retrieveCookies()
+    {
+        return $this->cookies;
+    }
+
     function download($url, $failed = false)
     {
         if ($downloadcount == 4995 || !$this->loggedin) {
@@ -20,7 +30,13 @@ class SMGrabber
         $context = stream_context_create(array('http' => array(
             'follow_location' => 0,
             'user_agent' => $this->useragent,
-            'header' => 'Cookie: ' . $this->processCookies()
+            'header' => array('Accept:text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                              'Accept-Charset:ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+                              'Accept-Language:en-US,en;q=0.8',
+                              'Host:en.strikermanager.com',
+                              'Referer:http://en.strikermanager.com/inicio.php',
+                              'Cookie:' . $this->processCookies()
+                             )
         )));
         $fp = fopen($url, 'r', false, $context);
         $info = stream_get_meta_data($fp);
@@ -84,23 +100,44 @@ class SMGrabber
             'follow_location' => 0,
             'user_agent' => $this->useragent,
             'header' => array(
+                'Accept:text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Charset:ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+                'Accept-Language:en-US,en;q=0.8',
+                'Cache-Control:max-age=0',
                 'Content-type: application/x-www-form-urlencoded',
                 'Content-length: ' . strlen($login),
+                'Host:en.strikermanager.com',
+                'Origin:http://en.strikermanager.com',
+                'Referer:http://en.strikermanager.com/',
             ),
             'content' => $login
         )));
         $fp = fopen('http://en.strikermanager.com/loginweb.php', 'r', false, $context);
         $info = stream_get_meta_data($fp);
         $this->getCookies($info['wrapper_data']);
+        if (Main::DEBUG) {
+            $a = stream_get_contents($fp);
+            //var_export($info['wrapper_data']);
+        }
         fclose($fp);
         $context = stream_context_create(array('http' => array(
             'user_agent' => $this->useragent,
             'header' => array(
+                'Accept:text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Charset:ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+                'Accept-Language:en-US,en;q=0.8',
+                'Cache-Control:max-age=0',
+                'Host:en.strikermanager.com',
+                'Referer:http://en.strikermanager.com/',
                 'Cookie: ' . $this->processCookies()
             )
         )));
         $fp = fopen('http://en.strikermanager.com/inicio.php', 'r', false, $context);
         $info = stream_get_meta_data($fp);
+        if (Main::DEBUG) {
+            $a = stream_get_contents($fp);
+            //var_export($info['wrapper_data']);
+        }
         $this->getCookies($info['wrapper_data']);
         // TODO: update the database with new cookie somehow, so others can pull it in too.
         fclose($fp);
