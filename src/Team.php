@@ -35,6 +35,5 @@ class Team
         $juniors = new Team\SquadGrabber($players, $this->id, $downloader);
         $juniors->go();
         $juniors->waitForChildren();
-        exit;
     }
 }

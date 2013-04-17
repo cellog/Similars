@@ -120,9 +120,23 @@ class Query
                 'average' => $transfer['average'],
                 'price' => $transfer['price'],
                 'type' => $this->main->fromTypeCode($transfer['type']),
+                'age' => $transfer['age'],
                 'url' => $transfer['url'],
             );
         }
+        return $ret;
+    }
+
+    function listings(array $s)
+    {
+        $d = new \DateTime;
+        $ret = '<ul>';
+        foreach ($s as $info) {
+            $d->setTimestamp($info['timestamp']);
+            $ret .= '<li>' . $info['age'] . ' ' . $info['average'] . ' $' . number_format($info['price']) . ' ' . $d->format('Y-m-d') . ' ' .
+                $info['type'] . '</li>';
+        }
+        $ret .= '</ul>';
         return $ret;
     }
 }
