@@ -27,13 +27,7 @@ class SquadGrabber extends ProcessManager
 
     function parent()
     {
-        if (Main::DEBUG) {
-            echo "parent " . $this->playerindex . "\n";
-        }
         return $this->playerindex >= count($this->players[1]);
-        $this->nextleague += 2;
-        if ($this->nextleague == self::ENDLEAGUE) return true;
-        return false;
     }
 
     function child()
@@ -47,6 +41,9 @@ class SquadGrabber extends ProcessManager
         if (Main::DEBUG) {
             echo "child " . $this->playerindex . "\n";
         }
-        echo $player->toJson(),"\n";
+        $main->updatePlayer($player);
+        if ($main::DEBUG) {
+            echo $player->toJson(),"\n";
+        }
     }
 }

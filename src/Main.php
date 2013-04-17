@@ -197,12 +197,12 @@ class Main
             if (self::DEBUG) {
                 echo "downloading league ", $id, "\n";
             }
+            $this->downloader->relogin(); // ensure we don't get booted
             $league = $this->downloader->download('http://en.strikermanager.com/liga.php?id_liga=' . $id);
             preg_match_all('@equipo\.php\?id=(\d+)">([^<]+)<@', $league, $matches);
             foreach($matches[1] as $i => $team) {
                 $team = new Team($team, $matches[2][$i]);
                 $team->getSquad($this->downloader, $this);
-                $team->update($this);
             }
             $id += 2;
         } while ($id <= $this->end);

@@ -1,6 +1,6 @@
 <?php
 namespace SimilarTransactions;
-abstract class ProcessManager
+abstract class ProcessManager implements \Countable
 {
     protected $pids = array();
     const PROCESSCOUNT = 50;
@@ -10,6 +10,29 @@ abstract class ProcessManager
     protected $isChild = false;
     function __construct()
     {
+    }
+
+    function count()
+    {
+        return count($this->pids);
+    }
+
+    function waitForChildren()
+    {
+        $count = count($this->pids);
+        do {
+            if ($count > count($this->pids)) {
+                $count = count($this->pids);
+            }
+            reset($this->pids);
+            \pcntl_wait($status, WNOHANG OR WUNTRACED);
+            while (list($key, $val) = each($this->pids)) {
+                if(!\posix_kill($val, 0)) {
+                    unset($this->pids[$key]);
+                }
+            }
+            $this->pids = array_values($this->pids); // Reindex the array
+        } while (count($this->pids));
     }
 
     function go()
