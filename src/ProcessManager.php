@@ -54,6 +54,7 @@ abstract class ProcessManager implements \Countable
             // child process
             $this->isChild = true;
             $this->child();
+            exit;
         } elseif (-1 == $pid) {
             // could not fork, so fail silently
             echo "ERROR: fork failed\n";

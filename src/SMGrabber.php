@@ -15,6 +15,7 @@ class SMGrabber
     function setCookies($cookies)
     {
         $this->cookies = $cookies;
+        $this->loggedin = true;
     }
 
     function retrieveCookies()
@@ -24,12 +25,13 @@ class SMGrabber
 
     function download($url, $failed = false)
     {
-        if ($downloadcount == 4995 || !$this->loggedin) {
+        if (!$this->loggedin) {
             $this->relogin();
         }
         $context = stream_context_create(array('http' => array(
             'follow_location' => 0,
             'user_agent' => $this->useragent,
+            'timeout' => 60.0,
             'header' => array('Accept:text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                               'Accept-Charset:ISO-8859-1,utf-8;q=0.7,*;q=0.3',
                               'Accept-Language:en-US,en;q=0.8',
