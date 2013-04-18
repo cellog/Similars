@@ -122,7 +122,7 @@ class SMGrabber
         $this->getCookies($info['wrapper_data']);
         if (Main::DEBUG) {
             $a = stream_get_contents($fp);
-            var_export($info['wrapper_data']);
+            //var_export($info['wrapper_data']);
         }
         fclose($fp);
         $context = stream_context_create(array('http' => array(
