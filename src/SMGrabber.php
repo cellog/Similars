@@ -29,7 +29,7 @@ class SMGrabber
             $this->relogin();
         }
         $context = stream_context_create(array('http' => array(
-            'follow_location' => 0,
+            //'follow_location' => 0,
             'user_agent' => $this->useragent,
             'protocol_version' => 1.1,
             'timeout' => 60.0,
@@ -100,7 +100,7 @@ class SMGrabber
             ));
         $context = stream_context_create(array('http' => array(
             'method' => 'POST',
-            'follow_location' => 0,
+            //'follow_location' => 0,
             'user_agent' => $this->useragent,
             'protocol_version' => 1.1,
             'header' => array(
