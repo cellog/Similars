@@ -103,6 +103,7 @@ class SMGrabber
             //'follow_location' => 0,
             'user_agent' => $this->useragent,
             'protocol_version' => 1.1,
+            'ignore_errors' => true,
             'header' => array(
                 'Accept:text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                 'Accept-Charset:ISO-8859-1,utf-8;q=0.7,*;q=0.3',
@@ -121,7 +122,7 @@ class SMGrabber
         $this->getCookies($info['wrapper_data']);
         if (Main::DEBUG) {
             $a = stream_get_contents($fp);
-            //var_export($info['wrapper_data']);
+            var_export($info['wrapper_data']);
         }
         fclose($fp);
         $context = stream_context_create(array('http' => array(
