@@ -36,7 +36,7 @@ if (isset($_POST) && isset($_POST['query'])) {
     }
     echo '<pre>';
     $s = $q->search();
-    echo "Average price: $", $q->averagePrice($s);
+    echo "Average price: $", number_format(round($q->averagePrice($s)), 0);
     echo $q->listings($s);
     echo '</pre>';
 }
