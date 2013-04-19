@@ -139,4 +139,18 @@ class Query
         $ret .= '</ul>';
         return $ret;
     }
+
+    function numPlayers()
+    {
+        $q = $this->db->query('SELECT COUNT(*) FROM player');
+        $res = $q->fetch_array();
+        return $res[0];
+    }
+
+    function numTransactions()
+    {
+        $q = $this->db->query('SELECT COUNT(*) FROM transaction');
+        $res = $q->fetch_array();
+        return $res[0];
+    }
 }
