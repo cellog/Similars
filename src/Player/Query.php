@@ -84,6 +84,7 @@ class Query
     function averagePrice($results)
     {
         $total = 0;
+        if (count($results) == 0) return 0;
         foreach ($results as $result) {
             $total += $result['price'];
         }
