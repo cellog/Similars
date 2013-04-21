@@ -1,3 +1,47 @@
+<html lang="en">
+ <head>
+  <link href="/sm/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <style type="text/css" media="screen">
+  table.tablesorter thead tr .headerSortUp {
+     background-image: url(/sm/bootstrap/img/asc.gif);
+    }
+    table.tablesorter thead tr .headerSortDown {
+     background-image: url(/sm/bootstrap/img/desc.gif);
+    }
+    table.tablesorter {
+     background-color: #CDCDCD;
+     margin:10px 0pt 15px;
+     font-size: 8pt;
+     width: 100%;
+     text-align: left;
+    }
+    table.tablesorter thead tr th, table.tablesorter tfoot tr th {
+     background-color: #e6EEEE;
+     border: 1px solid #FFF;
+     font-size: 8pt;
+     padding: 4px;
+    }
+    table.tablesorter thead tr .header {
+     background-image: url(/sm/bootstrap/img/bg.gif);
+     background-repeat: no-repeat;
+     background-position: center right;
+     cursor: pointer;
+    }
+    table.tablesorter tbody td {
+     color: #3D3D3D;
+     padding: 4px;
+     background-color: #FFF;
+     vertical-align: top;
+    }
+    table.tablesorter tbody tr.odd td {
+     background-color:#F0F0F6;
+    }
+    table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
+     background-color: #8dbdd8;
+    }
+  </style>
+ </head>
+ <body>
 <?php
 include __DIR__ . '/../autoload.php';
 $a = new SimilarTransactions\Main('dummy');
@@ -34,16 +78,43 @@ if (isset($_POST) && isset($_POST['query'])) {
             $q->average($a[0]);
         }
     }
+    if (isset($_POST['price']) && strlen($_POST['price'])) {
+        $a = $_POST['price'];
+        $a = str_replace(array('$',',','.'), array('', '', ''), $a);
+        $a = explode('-', $a);
+        if (count($a) == 2) {
+            $min = $a[0];
+            $max = $a[1];
+            if ($min < $max) {
+                $q->price($min)->price($max);
+            }
+        } elseif (count($a) == 1) {
+            $q->price($a[0]);
+        }
+    }
+    if (isset($_POST['date']) && strlen($_POST['date'])) {
+        $a = $_POST['date'];
+        $a = explode('-', $a);
+        if (count($a) == 2) {
+            $min = strtotime($a[0] . ' +1 day');
+            $max = strtotime($a[1] . ' +1 day');
+            if ($min < $max) {
+                $q->date($min)->date($max);
+            }
+        } elseif (count($a) == 1) {
+            $q->date(strtotime($a[0] . ' +1 day'));
+        }
+    }
     echo '<pre>';
     $s = $q->search();
     echo "Average price: $", number_format(round($q->averagePrice($s)), 0);
-    echo $q->listings($s);
     echo '</pre>';
+    echo $q->listings($s);
 }
 ?>
 <form name="query" action="index.php" method="post">
     <input type="hidden" name="query" value="1">
-    <p>Average: <input type="text" value="" name="average" placeholder="low-high"></p>
+    <p>Average: <input type="text" value="" name="average" placeholder="low-high or average"></p>
     Age: <select name="age[]" multiple="yes" size="3">
         <option>14</option>
         <option>15</option>
@@ -97,5 +168,20 @@ if (isset($_POST) && isset($_POST['query'])) {
         <option selected="yes">Direct Purchase</option>
         <option selected="yes">Hostile Clause</option>
     </select>
+    <p>Price: <input type="text" name="price" placeholder="low-high or price"></p>
+    <p>Date: <input type="text" name="date" placeholder="low-high or minimum YYYY/MM/DD"></p>
     <input type="submit" value="Search">
 </form>
+  <script src="http://code.jquery.com/jquery-latest.js"></script>
+  <script src="bootstrap/js/bootstrap.min.js"></script>
+  <script src="bootstrap/js/jquery.tablesorter.min.js"></script>
+  <script type="application/x-javascript">
+  
+$(document).ready(function() 
+    { 
+        $('#searchresultstable').tablesorter(); 
+    } 
+);
+  </script>
+ </body>
+</html>

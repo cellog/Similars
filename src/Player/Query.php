@@ -6,6 +6,10 @@ class Query
     protected $db;
     protected
         $main,
+        $minprice = false,
+        $mindate = false,
+        $maxprice = false,
+        $maxdate = false,
         $ages = array(),
         $positions = array(),
         $averages = array(),
@@ -55,10 +59,44 @@ class Query
         return $this;
     }
 
+    function price($price)
+    {
+        $ok = filter_var($price, \FILTER_VALIDATE_INT, array('min_range' => 0, 'max_range' => 100000000000000));
+        if (!$ok) {
+            throw new \Exception('Invalid price, must be between 0 and 100 trillion');
+        }
+        if (false === $this->minprice) {
+            $this->minprice = $price;
+            return $this;
+        }
+        if (false !== $this->maxprice) {
+            throw new \Exception('Invalid: minimum and maximum price have already been set');
+        }
+        $this->maxprice = $price;
+        return $this;
+    }
+
+    function date($date)
+    {
+        $ok = filter_var($date, \FILTER_VALIDATE_INT, array('min_range' => 0, 'max_range' => 9999999999));
+        if (!$ok) {
+            throw new \Exception('Invalid date must be a valid timestamp');
+        }
+        if (false === $this->mindate) {
+            $this->mindate = $date;
+            return $this;
+        }
+        if (false !== $this->maxdate) {
+            throw new \Exception('Invalid: minimum and maximum price have already been set');
+        }
+        $this->maxdate = $date;
+        return $this;
+    }
+
     function average($average)
     {
-        $ok = filter_var($average, \FILTER_VALIDATE_FLOAT);
-        if (!$ok || $average < 1 || $average > 99) {
+        $ok = filter_var($average, \FILTER_VALIDATE_INT, array('min_range' => 1, 'max_range' => 99));
+        if (!$ok) {
             throw new \Exception('Invalid average "' . $average . '"');
         }
         $this->averages[] = $ok;
@@ -106,6 +144,20 @@ class Query
         if (count($this->types)) {
             $sql .= ' AND type IN ("' . implode('","', $this->types) . '")';
         }
+        if (false !== $this->minprice) {
+            if (false !== $this->maxprice) {
+                $sql .= ' AND price >= ' . $this->minprice . ' AND price <= ' . $this->maxprice;
+            } else {
+                $sql .= ' AND price >= ' . $this->minprice;
+            }
+        }
+        if (false !== $this->mindate) {
+            if (false !== $this->maxdate) {
+                $sql .= ' AND UNIX_TIMESTAMP(stamp) >= ' . $this->mindate . ' AND UNIX_TIMESTAMP(stamp) <= ' . $this->maxdate;
+            } else {
+                $sql .= ' AND UNIX_TIMESTAMP(stamp) >= ' . $this->mindate;
+            }
+        }
         $sql .= ' ORDER BY stamp DESC';
         $result = $this->db->query($sql);
         if (!$result) {
@@ -122,6 +174,7 @@ class Query
                 'price' => $transfer['price'],
                 'type' => $this->main->fromTypeCode($transfer['type']),
                 'age' => $transfer['age'],
+                'position' => $transfer['position'],
                 'url' => $transfer['url'],
             );
         }
@@ -131,13 +184,22 @@ class Query
     function listings(array $s)
     {
         $d = new \DateTime;
-        $ret = '<ul>';
+        $ret = '
+    <table class="tablesorter" id="searchresultstable">
+    <thead>
+        <tr><th>Age</th><th>Pos.</th><th>Av.</th><th>Price</th><th>Date</th><th>Transaction Type</th></tr>
+    </thead>
+    <tbody>
+    ';
         foreach ($s as $info) {
             $d->setTimestamp($info['timestamp']);
-            $ret .= '<li>' . $info['age'] . ' ' . $info['average'] . ' $' . number_format($info['price']) . ' ' . $d->format('Y-m-d') . ' ' .
-                $info['type'] . '</li>';
+            $ret .= '<tr><td>' . $info['age'] . '</td><td>' . $info['position'] . '</td><td>' .
+                $info['average'] . '</td><td>$' .
+                number_format($info['price']) . '</td><td>' . $d->format('Y-m-d') . '</td><td>' .
+                $info['type'] . '</td></tr>';
         }
-        $ret .= '</ul>';
+        $ret .= '</tbody>
+    </table>';
         return $ret;
     }
 
