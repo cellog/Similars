@@ -178,9 +178,30 @@ if (isset($_POST) && isset($_POST['query'])) {
   <script type="application/x-javascript">
   
 $(document).ready(function() 
-    { 
-        $('#searchresultstable').tablesorter(); 
-    } 
+{ 
+$.tablesorter.addParser({
+        id: "monetaryValue",
+        is: function (s) {
+            var sp = s.replace(/,/, '.');
+            var test = (/([£$Û] ?\d+\.?\d*|\d+\.?\d* ?)/.test(sp)); //check currency with symbol
+            return test;
+        }, format: function (s) {
+            return $.tablesorter.formatFloat(s.replace(new RegExp(/[^\d\.]/g), ""));
+        }, type: "numeric"
+    });
+    $('#searchresultstable').tablesorter({
+        widgets:['zebra'],
+        textExtraction:function(node){
+            return $(node).text();
+        },
+        headers: {
+            3: { // 2 is column index
+                sorter: "monetaryValue"
+            }
+        },
+        sortList: [[4,1]]
+    });
+} 
 );
   </script>
  </body>
