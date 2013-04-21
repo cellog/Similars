@@ -92,18 +92,11 @@ if (isset($_POST) && isset($_POST['query'])) {
             $q->price($a[0]);
         }
     }
-    if (isset($_POST['date']) && strlen($_POST['date'])) {
-        $a = $_POST['date'];
-        $a = explode('-', $a);
-        if (count($a) == 2) {
-            $min = strtotime($a[0] . ' +1 day');
-            $max = strtotime($a[1] . ' +1 day');
-            if ($min < $max) {
-                $q->date($min)->date($max);
-            }
-        } elseif (count($a) == 1) {
-            $q->date(strtotime($a[0] . ' +1 day'));
-        }
+    if (isset($_POST['datelow']) && strlen($_POST['datelow'])) {
+        $q->date(strtotime($_POST['datelow'] . ' +1 day'));
+    }
+    if (isset($_POST['datehigh']) && strlen($_POST['datehigh'])) {
+        $q->date(strtotime($_POST['datehigh'] . ' +1 day'));
     }
     echo '<pre>';
     $s = $q->search();
@@ -169,7 +162,7 @@ if (isset($_POST) && isset($_POST['query'])) {
         <option selected="yes">Hostile Clause</option>
     </select>
     <p>Price: <input type="text" name="price" placeholder="low-high or price"></p>
-    <p>Date: <input type="text" name="date" placeholder="low-high or minimum YYYY/MM/DD"></p>
+    <p>Start Date: <input type="text" name="datelow"> End Date: <input type="text" name="datehigh"></p>
     <input type="submit" value="Search">
 </form>
   <script src="http://code.jquery.com/jquery-latest.js"></script>
