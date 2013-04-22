@@ -1,0 +1,6 @@
+<?php
+include __DIR__ . '/../autoload.php';
+// div 5 376-886
+$main = new SimilarTransactions\Main(51776, 51886);
+$main->downloadLeagues();
+?>
