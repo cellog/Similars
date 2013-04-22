@@ -32,7 +32,8 @@ class SquadGrabber extends ProcessManager
 
     function child()
     {
-        if ($this->playerindex > count($this->players[0]) || null === $this->players[1][$this->playerindex]) {
+        if ($this->playerindex > count($this->players[0]) || !isset($this->players[1][$this->playerindex])
+            || null === $this->players[1][$this->playerindex]) {
             return;
         }
         $player = new Player($this->players[1][$this->playerindex]);
