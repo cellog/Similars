@@ -47,24 +47,24 @@ include __DIR__ . '/../autoload.php';
 $a = new SimilarTransactions\Main('dummy');
 $q = new SimilarTransactions\Player\Query($a);
 echo '<pre>' . $q->numPlayers() . ' players processed, with ' . $q->numTransactions() . ' transactions</pre>';
-if (isset($_POST) && isset($_POST['query'])) {
-    if (isset($_POST['age'])) {
-        foreach ($_POST['age'] as $age) {
+if (isset($_GET) && isset($_GET['query'])) {
+    if (isset($_GET['age'])) {
+        foreach ($_GET['age'] as $age) {
             $q->age($age);
         }
     }
-    if (isset($_POST['positions'])) {
-        foreach($_POST['positions'] as $position) {
+    if (isset($_GET['positions'])) {
+        foreach($_GET['positions'] as $position) {
             $q->position($position);
         }
     }
-    if (isset($_POST['type'])) {
-        foreach ($_POST['type'] as $type) {
+    if (isset($_GET['type'])) {
+        foreach ($_GET['type'] as $type) {
             $q->type($type);
         }
     }
-    if (isset($_POST['average']) && $_POST['average']) {
-        $a = $_POST['average'];
+    if (isset($_GET['average']) && $_GET['average']) {
+        $a = $_GET['average'];
         $a = explode('-', $a);
         if (count($a) == 2) {
             $min = $a[0];
@@ -78,8 +78,8 @@ if (isset($_POST) && isset($_POST['query'])) {
             $q->average($a[0]);
         }
     }
-    if (isset($_POST['price']) && strlen($_POST['price'])) {
-        $a = $_POST['price'];
+    if (isset($_GET['price']) && strlen($_GET['price'])) {
+        $a = $_GET['price'];
         $a = str_replace(array('$',',','.'), array('', '', ''), $a);
         $a = explode('-', $a);
         if (count($a) == 2) {
@@ -92,11 +92,11 @@ if (isset($_POST) && isset($_POST['query'])) {
             $q->price($a[0]);
         }
     }
-    if (isset($_POST['datelow']) && strlen($_POST['datelow'])) {
-        $q->date(strtotime($_POST['datelow'] . ' +1 day'));
+    if (isset($_GET['datelow']) && strlen($_GET['datelow'])) {
+        $q->date(strtotime($_GET['datelow'] . ' +1 day'));
     }
-    if (isset($_POST['datehigh']) && strlen($_POST['datehigh'])) {
-        $q->date(strtotime($_POST['datehigh'] . ' +1 day'));
+    if (isset($_GET['datehigh']) && strlen($_GET['datehigh'])) {
+        $q->date(strtotime($_GET['datehigh'] . ' +1 day'));
     }
     echo '<pre>';
     $s = $q->search();
@@ -105,7 +105,7 @@ if (isset($_POST) && isset($_POST['query'])) {
     echo $q->listings($s);
 }
 ?>
-<form name="query" action="index.php" method="post">
+<form name="query" action="index.php" method="get">
     <input type="hidden" name="query" value="1">
     <p>Average: <input type="text" value="" name="average" placeholder="low-high or average"></p>
     Age: <select name="age[]" multiple="yes" size="3">
