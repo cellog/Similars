@@ -1,5 +1,6 @@
 <?php
+use SimilarTransactions\Main as a;
 include __DIR__ . '/../autoload.php';
-$main = new SimilarTransactions\Main(51248, 51374);
-$main->downloadLeagues();
+$main = new SimilarTransactions\Main('user2', a::div4(0), a::div4(1));
+$main->downloadLeagues(4);
 ?>

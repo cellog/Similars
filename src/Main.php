@@ -4,6 +4,7 @@ use Mysqli, mysqli_sql_exception, DateTime;
 class Main
 {
     const DEBUG = true;
+    const DIV1 = 60094;
     protected $user;
     protected $pass;
     protected $database;
@@ -14,7 +15,7 @@ class Main
      * @var Mysqli
      */
     protected $db;
-    function __construct($startleague, $endleague = null)
+    function __construct($user, $startleague, $endleague = null)
     {
         date_default_timezone_set('Africa/Abidjan');
         $this->start = $startleague;
@@ -23,11 +24,17 @@ class Main
             die("no configuration file found\n");
         }
         $info = json_decode(file_get_contents(__DIR__ . '/../config.json'), 1);
+        if (!isset($info['login'][$user])) {
+            die($user . ' is unknown user');
+        }
+        if (!isset($info['loginpass'][$user])) {
+            die($user . ' has unknown password');
+        }
         $this->user = $info['user'];
         $this->pass = $info['password'];
         $this->database = $info['database'];
-        $this->login = $info['login'];
-        $this->password = $info['loginpass'];
+        $this->login = $info['login'][$user];
+        $this->password = $info['loginpass'][$user];
         \mysqli_report(MYSQLI_REPORT_STRICT);
         try {
             $this->db = new Mysqli('127.0.0.1', $this->user, $this->pass, $this->database);
@@ -190,10 +197,13 @@ class Main
         }
     }
 
-    function downloadLeagues()
+    function downloadLeagues($delay = 0)
     {
         $id = $this->start;
         do {
+            if ($delay) {
+                sleep($delay);
+            }
             if (self::DEBUG) {
                 echo "downloading league ", $id, "\n";
             }
@@ -202,6 +212,9 @@ class Main
             preg_match_all('@equipo\.php\?id=(\d+)">([^<]+)<@', $league, $matches);
             foreach($matches[1] as $i => $team) {
                 $team = new Team($team, $matches[2][$i]);
+                if ($delay) {
+                    sleep($delay);
+                }
                 $team->getSquad($this->downloader, $this);
             }
             $id += 2;
@@ -221,8 +234,23 @@ class Main
         $date = new DateTime();
         $comp = new DateTime();
         $date->setTimestamp($stamp);
-        // March 29, 2013 is start of season 10
         $comp->setTime(0, 0, 0);
+        // Dec 26, 2013 is start of season 13
+        $comp->setDate(2013, 9, 26);
+        if ($date->diff($comp)->invert) {
+            return 13;
+        }
+        // Sep 26, 2013 is start of season 12
+        $comp->setDate(2013, 9, 26);
+        if ($date->diff($comp)->invert) {
+            return 12;
+        }
+        // June 27, 2013 is start of season 11
+        $comp->setDate(2013, 6, 27);
+        if ($date->diff($comp)->invert) {
+            return 11;
+        }
+        // March 29, 2013 is start of season 10
         $comp->setDate(2013, 3, 29);
         if ($date->diff($comp)->invert) {
             return 10;
@@ -268,5 +296,21 @@ class Main
     function __destruct()
     {
         $this->db->close();
+    }
+
+    static function div3()
+    {
+        return self::DIV1 + 40;
+    }
+
+    static function div4($chunk = 0)
+    {
+        return self::div3() + ($chunk * 128) + 2;
+    }
+
+    static function div5($chunk = 0)
+    {
+        $step = $chunk * 102 + $chunk*2;
+        return self::div4(1) + $step;
     }
 }
