@@ -43,10 +43,10 @@ class HistoryParser
                        '<td class="equipo"><a href="equipo.php\?id=\d+">[^<]+</a></td>\s+' .
                        '<td class="numerico">(?<average>\d+)</td>\s+' .
                        '<td><a href="equipo.php\?id=\d+">[^<]+</a></td>\s+' .
-                       '<td class="numerico">(?<amount>[0-9\.]+) &euro;</td>\s+' .
+                       '<td class="numerico">\$(?<amount>[0-9,]+)</td>\s+' .
                        '<td class="numerico" style="white-space:nowrap;">' .
                        '(?<type>Transfer agreement|Hostile Clause|Auction|Direct Purchase)</td>\s+' .
-                       '<td class="numerico">[0-9\.]+&nbsp;&euro;</td>@', $history, $matches);
+                       '<td class="numerico">\$[0-9\,]+</td>@', $history, $matches);
         $transfers = array();
         foreach ($matches[0] as $i => $notused) {
             $a = \DateTime::createFromFormat('j M H:i', $matches['stamp'][$i]);
@@ -73,7 +73,7 @@ class HistoryParser
             $transfers[] = array(
                 'timestamp' => $stamp,
                 'average' => $matches['average'][$i],
-                'price' => str_replace('.','', $matches['amount'][$i]),
+                'price' => str_replace(',','', $matches['amount'][$i]),
                 'type' => $matches['type'][$i],
                 'url' => $url,
             );
