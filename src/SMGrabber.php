@@ -88,7 +88,7 @@ class SMGrabber
             'user_agent' => $this->useragent,
         );
         if ($this->cookies) {
-            $logout['header'] = 'Cookie: ' . $this->cookies;
+            $logout['header'] = 'Cookie: ' . $this->processCookies();
         }
         $context = stream_context_create(array('http' => $logout));
         file_get_contents('http://en.strikermanager.com/logout.php', false, $context);
