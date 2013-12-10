@@ -39,6 +39,7 @@ class Main
         try {
             $this->db = new Mysqli('127.0.0.1', $this->user, $this->pass, $this->database);
         } catch (mysqli_sql_exception $e) {
+            $this->db = false;
             die('Connect Error (' . $e->getMessage() . ')');
         }
         $this->setupDatabase();
@@ -300,7 +301,9 @@ class Main
 
     function __destruct()
     {
-        $this->db->close();
+        if ($this->db) {
+            $this->db->close();
+        }
     }
 
     static function div3()
