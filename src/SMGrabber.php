@@ -123,7 +123,6 @@ class SMGrabber
         if (Main::DEBUG) {
             $a = stream_get_contents($fp);
             var_export($info['wrapper_data']);
-            echo $a;
         }
         fclose($fp);
         $context = stream_context_create(array('http' => array(
