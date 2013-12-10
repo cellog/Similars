@@ -11,6 +11,7 @@ class Main
     protected $downloader;
     protected $start;
     protected $end;
+    protected $metauser;
     /**
      * @var Mysqli
      */
@@ -35,6 +36,7 @@ class Main
         $this->database = $info['database'];
         $this->login = $info['login'][$user];
         $this->password = $info['loginpass'][$user];
+        $this->metauser = $user;
         \mysqli_report(MYSQLI_REPORT_STRICT);
         try {
             $this->db = new Mysqli('127.0.0.1', $this->user, $this->pass, $this->database);
@@ -53,7 +55,7 @@ class Main
 
     function getUser()
     {
-        return $this->user;
+        return $this->metauser;
     }
 
     function getLogin()
