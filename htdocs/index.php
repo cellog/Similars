@@ -44,7 +44,7 @@
  <body>
 <?php
 include __DIR__ . '/../autoload.php';
-$a = new SimilarTransactions\Main('dummy');
+$a = new SimilarTransactions\Main('user1', 'dummy');
 $q = new SimilarTransactions\Player\Query($a);
 echo '<pre>' . $q->numPlayers() . ' players processed, with ' . $q->numTransactions() . ' transactions</pre>';
 if (isset($_GET) && isset($_GET['query'])) {
