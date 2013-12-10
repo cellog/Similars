@@ -42,12 +42,17 @@ class Main
             die('Connect Error (' . $e->getMessage() . ')');
         }
         $this->setupDatabase();
-        $this->downloader = new SMGrabber($this);
+        $this->downloader = new SMGrabber($this, $user);
     }
 
     function getDatabase()
     {
         return $this->db;
+    }
+
+    function getUser()
+    {
+        return $this->user;
     }
 
     function getLogin()

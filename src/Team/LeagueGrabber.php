@@ -8,9 +8,11 @@ class LeagueGrabber extends ProcessManager
     protected $teamindex = -1;
     protected $downloader;
     protected $cookies;
-    function __construct($teams, $downloader)
+    protected $user;
+    function __construct($teams, $downloader, $user)
     {
         $this->teams = $teams;
+        $this->user = $user;
         $this->cookies = $downloader->retrieveCookies();
     }
 
@@ -27,7 +29,7 @@ class LeagueGrabber extends ProcessManager
     function child()
     {
         $team = new Team($this->teams[1][$this->teamindex], $this->teams[2][$this->teamindex]);
-        $main = new Main('dummy');
+        $main = new Main($this->user, 'dummy');
         $main->getDownloader()->setCookies($this->cookies);
         $team->getSquad($main->getDownloader(), $main);
         if (Main::DEBUG) {

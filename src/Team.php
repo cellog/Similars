@@ -22,7 +22,7 @@ class Team
         preg_match_all('@jugador\.php\?id_jugador=(\d+)" >[^<]+</a></td>\s+' .
                        '<td style="text-align: center;" title="[^"]+"><div style="display: none;">[^<]+</div>([A-Z]+)<@',
                        $senior, $players);
-        $seniors = new Team\SquadGrabber($players, $this->id, $downloader);
+        $seniors = new Team\SquadGrabber($players, $this->id, $downloader, $main->getUser());
         $seniors->go();
         $seniors->waitForChildren();
         if (Main::DEBUG) {
@@ -32,7 +32,7 @@ class Team
         preg_match_all('@jugador\.php\?id_jugador=(\d+)" >[^<]+</a></td>\s+' .
                        '<td style="text-align: center;" title="[^"]+"><div style="display: none;">[^<]+</div>([A-Z]+)<@',
                        $junior, $players);
-        $juniors = new Team\SquadGrabber($players, $this->id, $downloader);
+        $juniors = new Team\SquadGrabber($players, $this->id, $downloader, $main->getUser());
         $juniors->go();
         $juniors->waitForChildren();
     }
