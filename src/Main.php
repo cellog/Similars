@@ -4,7 +4,7 @@ use Mysqli, mysqli_sql_exception, DateTime;
 class Main
 {
     const DEBUG = true;
-    const DIV1 = 60094;
+    const DIV1 = 70368;
     protected $user;
     protected $pass;
     protected $database;
@@ -243,6 +243,11 @@ class Main
         $comp = new DateTime();
         $date->setTimestamp($stamp);
         $comp->setTime(0, 0, 0);
+        // Mar 27, 2014 is start of season 14
+        $comp->setDate(2014, 3, 27);
+        if ($date->diff($comp)->invert) {
+            return 14;
+        }
         // Dec 26, 2013 is start of season 13
         $comp->setDate(2013, 9, 26);
         if ($date->diff($comp)->invert) {
